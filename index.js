@@ -9,7 +9,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'];
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:4000'];
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin, like mobile apps or curl requests

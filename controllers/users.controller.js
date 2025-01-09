@@ -54,67 +54,6 @@ module.exports.deleteAccount = async (req,res)=>{
 }
 
 
-module.exports.ForgetPassword = async function (req, res) {
-  var email = req.body.email.trim();
-  if (!email) {
-      return res
-      .status(404)
-      .json({ message: "Please send the email!" });
-  }
-
-  var user = await User.findOne({ 
-    email: { $regex: new RegExp('^' + email + '$', 'i') },
-     status: true })
-  if (!user){
-      return res
-      .status(404)
-      .json({ message: "invalid email !" });
-  }
-  const pageLink = `https://www.floraindia.com/reset-password/${user._id}`;
-  const currentTime = new Date();
-  const newTime = new Date(currentTime.getTime() + 30 * 60 * 1000); // Add 30 
-  await User.findOneAndUpdate({ email: email}, {$set:{forgetPasswordExp: newTime}})
-
-  var keys = {
-    userName: common.toTitleCase(user.name) || '',
-  
-    type: "user",
-    template_name: "forget password mail to user",
-    userEmail: email,
-    UpdatePasswordURL:pageLink
-  };
-  common.dynamicEmail(keys);
-
-
-
-return res.status(200).json({message:"Link has been sent"});
-}
-
-module.exports.UpdateForgetPassword = async function (req, res) {
-  var user_id = req.body.user_id.trim();;
-  var password = req.body.password.trim();
-  if(!user_id || ! password){
-      return res
-      .status(404)
-      .json({ message: "Please send the both key Id and password!" });
-
-  }
-
-  var user = await User.findOne({ _id : user_id, status: true })
-  if (!user){
-      return
-  }
-  if (new Date() > user.forgetPasswordExp ){
-      return res.status(400).json({
-          message: "This Link has been expired, please request again"
-      })
-  }
-
-  await User.findOneAndUpdate({_id: user_id},{$set:{ password: password }})
-  .lean()
-  return res.status(200).json({message:"Your Password has been updated!"})
-
-}
 
 module.exports.SignUp = async function (req, res) {
   var contactNumber = req.body.contactNumber;
